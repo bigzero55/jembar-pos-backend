@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const itemsRouter = require("./items");
+const StocksRouter = require("./stocks");
 const salesRouter = require("./sales");
 
-router.use("/items", itemsRouter);
+router.use("/stocks", StocksRouter);
 router.use("/sales", salesRouter);
 
 router.get("/status", (req, res) => {

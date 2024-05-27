@@ -8,33 +8,6 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     throw err;
   } else {
     console.log("Database Terkoneksi dengan baik");
-    db.run(
-      `CREATE TABLE IF NOT EXISTS items (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                price REAL
-            )`,
-      (err) => {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
-
-    db.run(
-      `CREATE TABLE IF NOT EXISTS sales (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                item_id INTEGER,
-                quantity INTEGER,
-                total REAL,
-                FOREIGN KEY (item_id) REFERENCES items (id)
-            )`,
-      (err) => {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
 
     db.run(
       `CREATE TABLE IF NOT EXISTS Stocks (
@@ -109,7 +82,23 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     );
 
     db.run(
-      `CREATE TABLE IF NOT EXISTS Items_Sold (
+      `CREATE TABLE IF NOT EXISTS Suplayer (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                add_date INTEGER,
+                address TEXT,
+                company TEXT,
+                name TEXT,
+                phone TEXT
+            )`,
+      (err) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Items_Canceled (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 amount_pcs INTEGER,
                 amount_yard INTEGER,
@@ -128,6 +117,41 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 stock_yard INTEGER,
                 update_add_stock INTEGER DEFAULT NULL,
                 update_sell INTEGER NOT NULL
+            )`,
+      (err) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                advantage INTEGER,
+                capital INTEGER,
+                date INTEGER,
+                id_consument INTEGER,
+                id_officer INTEGER,
+                margin INTEGER,
+                note TEXT,
+                status TEXT DEFAULT 'success'
+            )`,
+      (err) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Consuments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                add_date INTEGER,
+                address TEXT,
+                company TEXT,
+                name TEXT,
+                phone TEXT
             )`,
       (err) => {
         if (err) {
