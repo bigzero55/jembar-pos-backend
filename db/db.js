@@ -1,6 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 
-const DBSOURCE = "database.db";
+const DBSOURCE = "db/database.db";
 
 let db = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {
@@ -34,17 +34,17 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE IF NOT EXISTS Add_Stocks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                tgl INTEGER,
+                name TEXT,
+                motif TEXT,
+                motif_code INTEGER,
+                seri TEXT,
                 grade TEXT,
+                pcs INTEGER,
+                yard INTEGER,
                 id_officer INTEGER,
                 id_stock INTEGER,
                 id_suplayer INTEGER,
-                motif TEXT,
-                motif_code INTEGER,
-                name TEXT,
-                pcs INTEGER,
-                seri TEXT,
-                yard INTEGER
+                tgl INTEGER
             )`,
       (err) => {
         if (err) {
@@ -56,23 +56,45 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE IF NOT EXISTS Items_Sold (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                amount_pcs INTEGER,
-                amount_yard INTEGER,
+                name TEXT,
+                motif TEXT,
+                motif_code INTEGER,
+                seri TEXT,
                 grade TEXT,
                 id_consument INTEGER,
                 id_officer INTEGER,
                 id_stock INTEGER,
                 id_transaction INTEGER,
+                amount_pcs INTEGER,
+                amount_yard INTEGER,
+                price_buy INTEGER,
+                price_sell INTEGER
+            )`,
+      (err) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Return (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
                 motif TEXT,
                 motif_code INTEGER,
-                name TEXT,
-                price_buy REAL,
-                price_sell REAL,
                 seri TEXT,
-                stock_pcs INTEGER,
-                stock_yard INTEGER,
-                update_add_stock INTEGER DEFAULT NULL,
-                update_sell INTEGER NOT NULL
+                grade TEXT,
+                id_consument INTEGER,
+                id_officer INTEGER,
+                id_stock INTEGER,
+                id_transaction INTEGER,
+                amount_pcs INTEGER,
+                amount_yard INTEGER,
+                price_buy INTEGER,
+                price_sell INTEGER,
+                canSell TEXT,
+                tgl INTEGER
             )`,
       (err) => {
         if (err) {
@@ -84,39 +106,11 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE IF NOT EXISTS Suplayer (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                add_date INTEGER,
+                name TEXT,
+                phone TEXT,
                 address TEXT,
                 company TEXT,
-                name TEXT,
-                phone TEXT
-            )`,
-      (err) => {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
-
-    db.run(
-      `CREATE TABLE IF NOT EXISTS Items_Canceled (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                amount_pcs INTEGER,
-                amount_yard INTEGER,
-                grade TEXT,
-                id_consument INTEGER,
-                id_officer INTEGER,
-                id_stock INTEGER,
-                id_transaction INTEGER,
-                motif TEXT,
-                motif_code INTEGER,
-                name TEXT,
-                price_buy REAL,
-                price_sell REAL,
-                seri TEXT,
-                stock_pcs INTEGER,
-                stock_yard INTEGER,
-                update_add_stock INTEGER DEFAULT NULL,
-                update_sell INTEGER NOT NULL
+                add_date INTEGER
             )`,
       (err) => {
         if (err) {
@@ -130,12 +124,12 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 advantage INTEGER,
                 capital INTEGER,
-                date INTEGER,
                 id_consument INTEGER,
                 id_officer INTEGER,
                 margin INTEGER,
                 note TEXT,
-                status TEXT DEFAULT 'success'
+                status TEXT DEFAULT 'success',
+                date INTEGER
             )`,
       (err) => {
         if (err) {
@@ -147,11 +141,11 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE IF NOT EXISTS Consuments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                add_date INTEGER,
+                name TEXT,
+                phone TEXT,
                 address TEXT,
                 company TEXT,
-                name TEXT,
-                phone TEXT
+                add_date INTEGER
             )`,
       (err) => {
         if (err) {
