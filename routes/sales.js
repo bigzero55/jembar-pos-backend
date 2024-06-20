@@ -387,27 +387,59 @@ router.post("/return", (req, res) => {
           return;
         }
 
-        // Jika canSell adalah "Ya", tambahkan jumlah stok kembali ke tabel Stocks
-        if (canSell === "YA") {
-          const updateStockSQL = `
-            UPDATE Stocks 
-            SET stock_pcs = stock_pcs + ?, 
-                stock_yard = stock_yard + ?
-            WHERE id = ?`;
-          const updateParams = [amount_pcs, amount_yard, id_stock];
+        // Update status pada tabel Transactions
+        const updateTransactionSQL = `
+          UPDATE Transactions 
+          SET status = 'return'
+          WHERE id = ?`;
+        const updateTransactionParams = [id_transaction];
 
-          db.run(updateStockSQL, updateParams, function (err) {
-            if (err) {
-              db.run("ROLLBACK", () => {
-                return res.status(500).json({
-                  error: "Failed to update Stocks",
-                  details: err.message,
+        db.run(updateTransactionSQL, updateTransactionParams, function (err) {
+          if (err) {
+            db.run("ROLLBACK", () => {
+              return res.status(500).json({
+                error: "Failed to update Transactions status",
+                details: err.message,
+              });
+            });
+            return;
+          }
+
+          // Jika canSell adalah "YA", tambahkan jumlah stok kembali ke tabel Stocks
+          if (canSell === "YA") {
+            const updateStockSQL = `
+              UPDATE Stocks 
+              SET stock_pcs = stock_pcs + ?, 
+                  stock_yard = stock_yard + ?
+              WHERE id = ?`;
+            const updateStockParams = [amount_pcs, amount_yard, id_stock];
+
+            db.run(updateStockSQL, updateStockParams, function (err) {
+              if (err) {
+                db.run("ROLLBACK", () => {
+                  return res.status(500).json({
+                    error: "Failed to update Stocks",
+                    details: err.message,
+                  });
+                });
+                return;
+              }
+
+              // Commit transaksi jika semua operasi berhasil
+              db.run("COMMIT", (err) => {
+                if (err) {
+                  return res
+                    .status(500)
+                    .json({ error: "Failed to commit transaction" });
+                }
+                res.json({
+                  message: "Return transaction completed successfully",
+                  status: "success",
                 });
               });
-              return;
-            }
-
-            // Commit transaksi jika semua operasi berhasil
+            });
+          } else {
+            // Commit transaksi jika hanya menambahkan ke tabel Return
             db.run("COMMIT", (err) => {
               if (err) {
                 return res
@@ -415,25 +447,12 @@ router.post("/return", (req, res) => {
                   .json({ error: "Failed to commit transaction" });
               }
               res.json({
-                message: "Return transaction completed successfully",
+                message: "Return transaction added to Return table only",
                 status: "success",
               });
             });
-          });
-        } else {
-          // Commit transaksi jika hanya menambahkan ke tabel Return
-          db.run("COMMIT", (err) => {
-            if (err) {
-              return res
-                .status(500)
-                .json({ error: "Failed to commit transaction" });
-            }
-            res.json({
-              message: "Return transaction added to Return table only",
-              status: "success",
-            });
-          });
-        }
+          }
+        });
       });
     });
   });
