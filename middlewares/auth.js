@@ -12,8 +12,8 @@ const basicAuth = (req, res, next) => {
   );
   const [username, password] = credentials.split(":");
 
-  const validUsername = "admin";
-  const validPassword = "password";
+  const validUsername = "admin-123";
+  const validPassword = "jembar-textile";
 
   if (username === validUsername && password === validPassword) {
     return next();

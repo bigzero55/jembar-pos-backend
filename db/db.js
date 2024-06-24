@@ -21,8 +21,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 stock_yard INTEGER,
                 price_buy INTEGER,
                 price_sell INTEGER,
-                update_add_stock INTEGER,
-                update_sell INTEGER
+                update_add_stock TEXT,
+                update_sell TEXT
             )`,
       (err) => {
         if (err) {
@@ -44,7 +44,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 id_officer INTEGER,
                 id_stock INTEGER,
                 id_suplayer INTEGER,
-                tgl INTEGER
+                tgl TEXT
             )`,
       (err) => {
         if (err) {
@@ -94,7 +94,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 price_buy INTEGER,
                 price_sell INTEGER,
                 canSell TEXT,
-                tgl INTEGER
+                tgl TEXT
             )`,
       (err) => {
         if (err) {
@@ -110,7 +110,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 phone TEXT,
                 address TEXT,
                 company TEXT,
-                add_date INTEGER
+                add_date TEXT
             )`,
       (err) => {
         if (err) {
@@ -129,7 +129,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 margin INTEGER,
                 note TEXT,
                 status TEXT DEFAULT 'success',
-                date INTEGER
+                date TEXT
             )`,
       (err) => {
         if (err) {
@@ -145,7 +145,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 phone TEXT,
                 address TEXT,
                 company TEXT,
-                add_date INTEGER
+                add_date TEXT
             )`,
       (err) => {
         if (err) {

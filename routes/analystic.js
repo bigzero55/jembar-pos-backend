@@ -7,23 +7,26 @@ router.get("/summary", (req, res) => {
 
   let query = `
     SELECT 
-      strftime('%Y-%m-%d', date / 1000, 'unixepoch') as date, 
+      DATE(Transactions.date) as date, 
       SUM(price_sell * amount_yard) as total_sales
     FROM Transactions 
     JOIN Items_Sold ON Transactions.id = Items_Sold.id_transaction
-    WHERE status = 'success'
+    WHERE Transactions.status = 'success'
   `;
 
   if (period === "daily") {
-    query += "GROUP BY strftime('%Y-%m-%d', date / 1000, 'unixepoch')";
+    query += "GROUP BY DATE(Transactions.date)";
   } else if (period === "monthly") {
-    query += "GROUP BY strftime('%Y-%m', date / 1000, 'unixepoch')";
+    query += "GROUP BY strftime('%Y-%m', Transactions.date)";
   } else if (period === "yearly") {
-    query += "GROUP BY strftime('%Y', date / 1000, 'unixepoch')";
+    query += "GROUP BY strftime('%Y', Transactions.date)";
   }
 
   if (startDate && endDate) {
-    query += " HAVING date >= ? AND date <= ?";
+    query += `
+      HAVING DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
+    `;
   }
 
   const params = startDate && endDate ? [startDate, endDate] : [];
@@ -44,22 +47,23 @@ router.get("/by-product", (req, res) => {
 
   let query = `
     SELECT 
-      name,
+      Items_Sold.name,
       SUM(price_sell * amount_yard) as total_sales,
       SUM(amount_pcs) as total_pcs_sold,
       SUM(amount_yard) as total_yards_sold
     FROM Items_Sold
-    WHERE id_transaction IN (
-      SELECT id FROM Transactions WHERE status = 'success'
-    )
+    JOIN Transactions ON Items_Sold.id_transaction = Transactions.id
+    WHERE Transactions.status = 'success'
   `;
 
   if (startDate && endDate) {
-    query +=
-      " AND strftime('%Y-%m-%d', date / 1000, 'unixepoch') >= ? AND strftime('%Y-%m-%d', date / 1000, 'unixepoch') <= ?";
+    query += `
+      AND DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
+    `;
   }
 
-  query += " GROUP BY name";
+  query += " GROUP BY Items_Sold.name";
 
   const params = startDate && endDate ? [startDate, endDate] : [];
 
@@ -89,8 +93,10 @@ router.get("/sales-by-customer", (req, res) => {
   `;
 
   if (startDate && endDate) {
-    query +=
-      " AND strftime('%Y-%m-%d', Transactions.date / 1000, 'unixepoch') >= ? AND strftime('%Y-%m-%d', Transactions.date / 1000, 'unixepoch') <= ?";
+    query += `
+      AND DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
+    `;
   }
 
   query += " GROUP BY Consuments.name";
@@ -126,20 +132,22 @@ router.get("/product-ranking", (req, res) => {
 
   let query = `
     SELECT 
-      name,
+      Items_Sold.name,
       ${rankingColumn} as ranking_value
     FROM Items_Sold
-    WHERE id_transaction IN (
-      SELECT id FROM Transactions WHERE status = 'success'
-    )
+    JOIN Transactions ON Items_Sold.id_transaction = Transactions.id
+    WHERE Transactions.status = 'success'
   `;
 
   // Add date filtering if provided
   if (startDate && endDate) {
-    query += ` AND strftime('%Y-%m-%d', date / 1000, 'unixepoch') >= ? AND strftime('%Y-%m-%d', date / 1000, 'unixepoch') <= ?`;
+    query += `
+      AND DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
+    `;
   }
 
-  query += " GROUP BY name ORDER BY ranking_value DESC";
+  query += " GROUP BY Items_Sold.name ORDER BY ranking_value DESC";
 
   const params = startDate && endDate ? [startDate, endDate] : [];
 
@@ -204,12 +212,12 @@ router.get("/profit", (req, res) => {
 
   if (startDate && endDate) {
     profitQuery += `
-      AND Transactions.date >= ?
-      AND Transactions.date <= ?
+      AND DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
     `;
     capitalQuery += `
-      AND Transactions.date >= ?
-      AND Transactions.date <= ?
+      AND DATE(Transactions.date) >= ?
+      AND DATE(Transactions.date) <= ?
     `;
   }
 

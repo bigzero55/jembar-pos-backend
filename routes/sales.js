@@ -458,4 +458,38 @@ router.post("/return", (req, res) => {
   });
 });
 
+router.get("/check-return/:id_transaction", (req, res) => {
+  const { id_transaction } = req.params;
+
+  // Query untuk mencari barang yang diretur berdasarkan ID transaksi
+  const sql = `
+    SELECT * 
+    FROM Return 
+    WHERE id_transaction = ?`;
+
+  db.all(sql, [id_transaction], (err, rows) => {
+    if (err) {
+      res
+        .status(500)
+        .json({
+          error: "Failed to retrieve return items",
+          details: err.message,
+        });
+      return;
+    }
+
+    if (rows.length === 0) {
+      res.json({
+        message: "No return items found for this transaction",
+        data: [],
+      });
+    } else {
+      res.json({
+        message: "Return items found",
+        data: rows,
+      });
+    }
+  });
+});
+
 module.exports = router;
